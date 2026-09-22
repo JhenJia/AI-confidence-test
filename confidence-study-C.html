@@ -151,6 +151,18 @@ const TOPICS = [
       {id:"hist5", c:91, err:false, t:"Britain declared war on Germany on 4 August 1914, after German forces invaded Belgium."},
       {id:"hist6", c:86, err:true,  t:"The United States entered the war in 1915, immediately after the sinking of the Lusitania.",
         fix:"The United States entered the war in April 1917. The Lusitania was sunk in May 1915."}
+    ]},
+  { id:"study", label:"Study skills",
+    q:"How can you study more effectively, and which common study habits actually work?",
+    claims:[
+      {id:"study1", c:95, err:false, t:"Spacing study sessions out over time produces better long-term retention than cramming the same material into one session."},
+      {id:"study2", c:93, err:false, t:"Testing yourself on the material (retrieval practice) strengthens memory more than simply re-reading your notes."},
+      {id:"study3", c:88, err:true,  t:"You learn best when material is presented in your preferred learning style, such as visual, auditory or kinesthetic.",
+        fix:"Controlled studies have not found evidence that matching teaching to a person's preferred learning style improves learning. This is a widely repeated idea that lacks solid support."},
+      {id:"study4", c:90, err:false, t:"Getting enough sleep after studying helps consolidate what you have learned into memory."},
+      {id:"study5", c:66, err:false, t:"Highlighting and underlining text is one of the weaker study techniques, compared with self-testing."},
+      {id:"study6", c:58, err:true,  t:"Listening to music with lyrics while studying generally helps most people focus and remember better.",
+        fix:"Most research finds that music with lyrics tends to interfere with reading and verbal memory tasks for most people; instrumental or no music has a smaller effect."}
     ]}
 ];
 const FAM = ["Never heard of it","Vaguely familiar","Somewhat","Quite familiar","I know this well"];
@@ -161,15 +173,16 @@ const USAGE = ["Never","A few times a term","Weekly","Most days"];
 const SURVEY_Q = [
   {k:"sure",   l:"I felt sure about my decisions.", conds:["A","B","C"]},
   {k:"google", l:"Being able to jump straight to Google helped me check a sentence.", conds:["A","B","C"]},
-  {k:"trust",  l:"I trusted the confidence labels.", conds:["B","C"]},
+  {k:"trust",  l:"The higher a sentence's confidence level, the more I trusted that sentence's answer.", conds:["B","C"]},
   {k:"changed",l:"The labels changed which sentences I chose to check.", conds:["B","C"]},
   {k:"precise",l:"The exact percentages felt more precise than they could really be.", conds:["B"]},
   {k:"use",    l:"I would use answers presented this way for my coursework.", conds:["A","B","C"]}
 ];
 const FIXED_COND = "C";
+const SHEET_COND = "Study_C";
 // After you deploy the Google Apps Script, paste its Web app URL between the quotes.
 // Leave it empty to turn automatic sending off (participants then save a file instead).
-const ENDPOINT = "https://script.google.com/macros/s/AKfycbwUfsfINV6qmaaBVbYH7AWVoF6tPE0Hjps8vpa8lC7CI7J8r0ezHW5uu3YmqnLlZtSOAw/exec";
+const ENDPOINT = "";
 // Optional: your contact details, shown in the consent text, e.g. "Contact: name@university.edu".
 const CONTACT = "";
 const KEY = "conf-study-v3-C";
@@ -214,7 +227,7 @@ function progressBar(){
 /* ---------- Screens ---------- */
 function screenIntro(){
   return `<h1>How do you review an AI answer?</h1>
-  <p class="muted">A short study, about 10 minutes. You will read three AI answers to study questions (SQL, business analysis and history). For each one you first read the whole answer, then decide what you would do with each sentence before using it in an assignment.</p>
+  <p class="muted">A short study, about 10 minutes. You will read four AI answers to study questions (SQL, business analysis, history and study skills). For each one you first read the whole answer, then decide what you would do with each sentence before using it in an assignment.</p>
   <div class="panel">
     <h2>Before you start</h2>
     <p class="small">Some sentences in these answers are deliberately wrong. Any confidence labels shown were written by the researchers for this study and are not calculated by a real AI. If you choose "I want to check this now", a Google search for that sentence opens in a new tab so you can look it up. ${dataNote()}</p>
@@ -323,7 +336,7 @@ function buildJSON(){
       read_time_ms:(S.tJudge[T.id]&&S.tStart[T.id])? S.tJudge[T.id]-S.tStart[T.id] : null,
       judge_time_ms:(S.tEnd[T.id]&&S.tJudge[T.id])? S.tEnd[T.id]-S.tJudge[T.id] : null };
   }));
-  return { study:"ai-answer-review-v2", submission_id:S.submissionId, participant_id:S.pid, condition:S.cond, ai_use_coursework:USAGE[S.usage]??null,
+  return { study:"ai-answer-review-v2", submission_id:S.submissionId, participant_id:S.pid, condition:SHEET_COND, ai_use_coursework:USAGE[S.usage]??null,
     started_at:S.startedAt, finished_at:S.finishedAt, survey:S.survey, survey_open_text:S.open, metrics:metrics(), claims };
 }
 function toCSV(obj){
