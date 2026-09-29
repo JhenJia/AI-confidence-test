@@ -165,7 +165,7 @@ const SHEET_COND = "Study_B";
 const ENDPOINT = "https://script.google.com/macros/s/AKfycbyNBXbb5YmTjv-2s8WL8q3Kx3fc2UatS-dTVWM-Ro7xiPBMJByu82P41UyYFIwT5vkJ4A/exec";
 // Optional: your contact details, shown in the consent text, e.g. "Contact: name@university.edu".
 const CONTACT = "";
-const KEY = "conf-study-v3-B";
+const KEY = "conf-study-v4-B";
 const PH = ["fam","read","judge"];
 
 /* ---------- State ---------- */
@@ -207,7 +207,7 @@ function progressBar(){
 /* ---------- Screens ---------- */
 function screenIntro(){
   return `<h1>How do you review an AI answer?</h1>
-  <p class="muted">A short study, about 10 minutes. You will read four AI answers to study questions (SQL, business analysis, history and study skills). For each one you first read the whole answer, then decide what you would do with each sentence before using it in an assignment.</p>
+  <p class="muted">A short study, about 5 minutes. You will read three short AI answers (about sleep, the Moon and money). For each one you first read the whole answer, then decide what you would do with each sentence before using it in an assignment.</p>
   <div class="panel">
     <h2>Before you start</h2>
     <p class="small">Some sentences in these answers are deliberately wrong. Any confidence labels shown were written by the researchers for this study and are not calculated by a real AI. If you choose "I want to check this now", a Google search for that sentence opens in a new tab so you can look it up. ${dataNote()}</p>
@@ -316,7 +316,7 @@ function buildJSON(){
       read_time_ms:(S.tJudge[T.id]&&S.tStart[T.id])? S.tJudge[T.id]-S.tStart[T.id] : null,
       judge_time_ms:(S.tEnd[T.id]&&S.tJudge[T.id])? S.tEnd[T.id]-S.tJudge[T.id] : null };
   }));
-  return { study:"ai-answer-review-v2", submission_id:S.submissionId, participant_id:S.pid, condition:SHEET_COND, ai_use_coursework:USAGE[S.usage]??null,
+  return { study:"ai-answer-review-v3", submission_id:S.submissionId, participant_id:S.pid, condition:SHEET_COND, ai_use_coursework:USAGE[S.usage]??null,
     started_at:S.startedAt, finished_at:S.finishedAt, survey:S.survey, survey_open_text:S.open, metrics:metrics(), claims };
 }
 function toCSV(obj){
@@ -335,7 +335,7 @@ function screenDone(){
       <div><b>${m.errors_marked_wrong_or_check-m.errors_marked_wrong}</b>marked "would check"</div>
       <div><b>${m.errors_accepted}</b>accepted as is</div>
     </div>
-    <p class="small muted">Six sentences were deliberately incorrect, two per question. Some had a high confidence label and some a low one, and the labels were written by the researchers, not calculated by an AI.</p>`;
+    <p class="small muted">Four of the twelve sentences were deliberately incorrect.${S.cond==="A"?"":" Some had a high confidence label and some a low one, and the labels were written by the researchers, not calculated by an AI."}</p>`;
   TOPICS.forEach(T=>T.claims.filter(c=>c.err).forEach(c=>{
     const d = (S.dec[c.id]||{}).d;
     const dl = DECS.find(o=>o.k===d);
