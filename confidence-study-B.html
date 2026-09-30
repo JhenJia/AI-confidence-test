@@ -325,26 +325,91 @@ function toCSV(obj){
   return [cols.join(","), ...rows.map(r=>cols.map(k=> k==="participant_id"?q(obj.participant_id): k==="condition"?q(obj.condition): k==="ai_use_coursework"?q(obj.ai_use_coursework): q(r[k])).join(","))].join("\n");
 }
 
+const stanceOf = id => {
+  const d = S.dec[id]; if(!d || !d.d) return null;
+  if(d.d==="accept" || d.d==="check_later") return "correct";
+  if(d.d==="wrong") return "wrong";
+  return d.after==="correct" ? "correct" : d.after==="wrong" ? "wrong" : "unsure";
+};
+const AFTER_TXT = {correct:"Correct", wrong:"Wrong", unsure:"Not sure"};
+const pctOf = (a,b) => b ? Math.round(a/b*100)+"%" : "n/a";
+const plural = (n,w) => n+" "+w+(n===1?"":"s");
+ 
 function screenDone(){
-  const m = metrics(), json = JSON.stringify(buildJSON(), null, 2);
+  const json = JSON.stringify(buildJSON(), null, 2);
+  const errs = Object.values(CLAIMS).filter(c=>c.err);
+  const st = c => stanceOf(c.id), dd = c => (S.dec[c.id]||{}).d;
+  const caught = errs.filter(c=>st(c)==="wrong");
+  const missed = errs.filter(c=>st(c)==="correct");
+  const unsure = errs.filter(c=>st(c)!=="wrong" && st(c)!=="correct");
+ 
+  /* per-topic summary */
+  const info = TOPICS.map(T=>{
+    const cl = T.claims, e = cl.filter(c=>c.err);
+    return { T, fam:S.fam[T.id]||0, n:cl.length,
+      own: cl.filter(c=>["accept","wrong"].includes(dd(c))).length,
+      chk: cl.filter(c=>["check_now","check_later"].includes(dd(c))).length,
+      eN: e.length,
+      eCaught: e.filter(c=>st(c)==="wrong").length,
+      eMissed: e.filter(c=>st(c)==="correct").length };
+  });
+  const sum = (arr,k) => arr.reduce((a,x)=>a+x[k],0);
+  const hiF = info.filter(x=>x.fam>=4), loF = info.filter(x=>x.fam>=1 && x.fam<=3);
+ 
+  /* insight sentences */
+  const ins = [];
+  if(hiF.length){
+    const n=sum(hiF,"n"), own=sum(hiF,"own"), chk=sum(hiF,"chk"), eN=sum(hiF,"eN"), eM=sum(hiF,"eMissed");
+    ins.push(`In ${hiF.length===1?"the topic":"the topics"} you rated 4 or 5 (${hiF.map(x=>x.T.label).join(", ")}), you decided on your own (accepted it, or marked it wrong) on ${own} of ${n} sentences, and chose to check ${chk}.`);
+    if(eN) ins.push(eM
+      ? `Those topics included ${plural(eN,"wrong sentence")}, and you accepted ${eM} of them as correct. Feeling sure about a topic does not guarantee that an AI answer about it is right.`
+      : `Those topics included ${plural(eN,"wrong sentence")}, and you did not accept any of them as correct.`);
+    if(loF.length) ins.push(`In the topics you knew less well, you chose to check ${pctOf(sum(loF,"chk"),sum(loF,"n"))} of the sentences, compared with ${pctOf(chk,n)} in the topics you knew well.`);
+  } else {
+    ins.push("You did not rate any topic 4 or 5 this time, so there is no familiar topic to compare with.");
+  }
+  if(S.cond!=="A"){
+    const hiE = errs.filter(c=>c.c>=85);
+    if(hiE.length) ins.push(`${plural(hiE.length,"wrong sentence")} carried a high confidence label (${hiE.map(c=>S.cond==="B"?c.c+"%":"High").join(", ")}). You caught ${hiE.filter(c=>st(c)==="wrong").length} and accepted ${hiE.filter(c=>st(c)==="correct").length} as correct. A high confidence label does not mean the sentence is right.`);
+  }
+  const viaG = errs.filter(c=>dd(c)==="check_now");
+  if(viaG.length){
+    const w = viaG.filter(c=>st(c)==="wrong").length, r = viaG.filter(c=>st(c)==="correct").length, u = viaG.length-w-r;
+    ins.push(`You used Google on ${plural(viaG.length,"wrong sentence")}. After looking it up you judged ${w} wrong and ${r} correct${u?`, and ${u} you were not sure about`:""}.${r?" Even after checking, a wrong sentence can look right.":""}`);
+  }
+  const later = errs.filter(c=>dd(c)==="check_later");
+  if(later.length) ins.push(`On ${plural(later.length,"wrong sentence")} you chose to accept it and check later. Those count as accepted here.`);
+ 
+  /* one card per wrong sentence */
+  const cards = errs.map(c=>{
+    const T = TOPICS.find(t=>t.id===c.topic), d = S.dec[c.id]||{}, s = stanceOf(c.id);
+    const dl = DECS.find(o=>o.k===d.d);
+    const out = s==="wrong" ? ["good","Caught"] : s==="correct" ? ["bad","Accepted as correct"] : ["","Not sure"];
+    return `<div class="err-item"><p class="ctext">${esc(c.t)}</p><p class="small">${esc(c.fix)}</p>
+      <span class="badge">${esc(T.label)}</span>
+      <span class="badge">Your familiarity: ${S.fam[T.id]||"-"}/5</span>
+      ${S.cond!=="A"?`<span class="badge">Label shown: ${S.cond==="B"?c.c+"%":tierName[tier(c.c)]}</span>`:""}
+      <span class="badge">You chose: ${dl?dl.l:"none"}</span>
+      ${d.d==="check_now"?`<span class="badge">After checking you said: ${d.after?AFTER_TXT[d.after]:"no answer"}</span>`:""}
+      <span class="badge ${out[0]}">${out[1]}</span></div>`;
+  }).join("");
+ 
   let h = `<h1>Thank you</h1>
   <p class="muted">Here is what was going on, and how you did.</p>
   <div class="panel"><h2>Your decisions on the wrong sentences</h2>
     <div class="stat">
-      <div><b>${m.errors_marked_wrong} of ${m.errors_total}</b>marked as wrong</div>
-      <div><b>${m.errors_marked_wrong_or_check-m.errors_marked_wrong}</b>marked "would check"</div>
-      <div><b>${m.errors_accepted}</b>accepted as is</div>
+      <div><b>${caught.length} of ${errs.length}</b>wrong sentences caught</div>
+      <div><b>${missed.length}</b>accepted as correct</div>
+      <div><b>${unsure.length}</b>not sure or no answer</div>
     </div>
-    <p class="small muted">Four of the twelve sentences were deliberately incorrect.${S.cond==="A"?"":" Some had a high confidence label and some a low one, and the labels were written by the researchers, not calculated by an AI."}</p>`;
-  TOPICS.forEach(T=>T.claims.filter(c=>c.err).forEach(c=>{
-    const d = (S.dec[c.id]||{}).d;
-    const dl = DECS.find(o=>o.k===d);
-    h += `<div class="err-item"><p class="ctext">${esc(c.t)}</p><p class="small">${esc(c.fix)}</p>
-      <span class="badge">${T.label}</span>
-      ${S.cond!=="A"?`<span class="badge">Label shown: ${S.cond==="B"?c.c+"%":tierName[tier(c.c)]}</span>`:""}
-      <span class="badge ${d==="accept"?"bad":"good"}">You chose: ${dl?dl.l:"none"}</span></div>`;
-  }));
-  h += `</div>
+    <p class="small muted">${errs.length} of the ${Object.keys(CLAIMS).length} sentences were deliberately incorrect. "Caught" means you marked a sentence wrong, or looked it up on Google and then judged it wrong.${S.cond==="A"?"":" The confidence labels were written by the researchers, not calculated by an AI."}</p>
+    ${cards}
+  </div>
+  <div class="panel"><h2>What your choices suggest</h2>
+    <div class="stat">${info.map(x=>`<div><b>${x.fam} / 5</b>${esc(x.T.label)}<br><span class="small muted">Decided on your own: ${x.own} of ${x.n}. Checked: ${x.chk}. Wrong sentences caught: ${x.eCaught} of ${x.eN}.</span></div>`).join("")}</div>
+    ${ins.map(t=>`<p>${t}</p>`).join("")}
+  </div>`;
+  h += `
   ${ENDPOINT ? `<div class="panel"><h2>Sending your results</h2>
     <div class="notice" id="sendstatus" aria-live="polite" style="font-size:.95rem;color:var(--ink)"></div>
     <div class="btnrow"><button class="ghost" id="retry" hidden>Try sending again</button></div></div>` : ""}
@@ -361,6 +426,7 @@ function screenDone(){
   </div>`;
   return h;
 }
+ 
 
 /* ---------- Render + events ---------- */
 function render(){
