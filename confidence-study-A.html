@@ -116,53 +116,33 @@ textarea.export{width:100%;min-height:120px;font-family:ui-monospace,Menlo,Conso
 <script>
 /* ---------- Study content (ground truth is in `err`; claims are in reading order) ---------- */
 const TOPICS = [
-  { id:"sql", label:"SQL",
-    q:"Explain the difference between WHERE and HAVING in SQL, and how INNER JOIN and LEFT JOIN work.",
+  { id:"sleep", label:"Sleep",
+    q:"Why does sleep matter, and how much do adults need?",
     claims:[
-      {id:"sql1", c:96, err:false, t:"WHERE filters individual rows before any grouping takes place."},
-      {id:"sql2", c:95, err:false, t:"HAVING filters groups after GROUP BY has been applied, so it can use aggregate functions such as COUNT or SUM."},
-      {id:"sql3", c:62, err:true,  t:"COUNT(column_name) counts every row in the table, including rows where that column is NULL.",
-        fix:"COUNT(column_name) ignores NULL values in that column. COUNT(*) is the version that counts all rows."},
-      {id:"sql4", c:94, err:false, t:"An INNER JOIN returns only the rows that have matching values in both tables."},
-      {id:"sql5", c:87, err:true,  t:"A LEFT JOIN returns all rows from the right table, together with the matching rows from the left table.",
-        fix:"A LEFT JOIN returns all rows from the left table, together with the matching rows from the right table (with NULLs where there is no match)."},
-      {id:"sql6", c:68, err:false, t:"Indexes usually speed up reads on the indexed columns but add some cost to inserts and updates."}
+      {id:"s1", c:95, err:false, t:"Most adults need about 7 to 9 hours of sleep a night."},
+      {id:"s2", c:93, err:false, t:"Sleep helps the brain store what you learned during the day."},
+      {id:"s3", c:88, err:true,  t:"A drink of alcohol before bed improves the quality of your sleep.",
+        fix:"Alcohol can help you fall asleep faster, but it tends to disrupt sleep later in the night and reduces REM sleep, so overall sleep quality is worse."},
+      {id:"s4", c:68, err:false, t:"Caffeine in the afternoon can still disrupt your sleep that night."}
     ]},
-  { id:"ba", label:"Business analysis",
-    q:"Explain what a business analyst does, and describe requirement types, SWOT analysis, requirement prioritisation and final testing of a solution.",
+  { id:"moon", label:"The Moon",
+    q:"What are some basic facts about the Moon?",
     claims:[
-      {id:"ba1", c:95, err:false, t:"A business analyst identifies business needs and recommends solutions, acting as a link between stakeholders and the delivery team."},
-      {id:"ba2", c:96, err:false, t:"A functional requirement describes what a system should do, for example letting a customer reset their password."},
-      {id:"ba3", c:94, err:false, t:"A non-functional requirement describes how well the system should perform, such as its response time, security or usability."},
-      {id:"ba4", c:89, err:true,  t:"In a SWOT analysis, strengths and opportunities are internal factors, while weaknesses and threats come from outside the organisation.",
-        fix:"Strengths and weaknesses are internal factors. Opportunities and threats are external factors."},
-      {id:"ba5", c:69, err:false, t:"The MoSCoW method prioritises requirements as Must have, Should have, Could have and Won't have (this time)."},
-      {id:"ba6", c:60, err:true,  t:"User acceptance testing is normally carried out by the developers who built the solution.",
-        fix:"User acceptance testing is normally carried out by the business users or stakeholders who will use the solution, not by the developers who built it."}
+      {id:"m1", c:96, err:false, t:"The Moon takes about a month to orbit the Earth."},
+      {id:"m2", c:92, err:false, t:"The Moon's gravity is the main cause of ocean tides on Earth."},
+      {id:"m3", c:66, err:false, t:"Moonlight is sunlight reflected off the Moon's surface."},
+      {id:"m4", c:61, err:true,  t:"The Moon does not rotate, which is why we always see the same side of it.",
+        fix:"The Moon does rotate. It spins once for every orbit around the Earth, which is why the same side always faces us."}
     ]},
-  { id:"hist", label:"History",
-    q:"What led to the First World War, and how did it unfold from 1914 to 1917?",
+  { id:"money", label:"Money basics",
+    q:"What are the basics of inflation, interest and investing?",
     claims:[
-      {id:"hist1", c:97, err:false, t:"Archduke Franz Ferdinand was assassinated in Sarajevo on 28 June 1914."},
-      {id:"hist2", c:57, err:true,  t:"Historians broadly agree that the alliance system alone caused the war.",
-        fix:"Historians debate the causes and weigh several factors, including militarism, nationalism, imperial rivalry and diplomacy. There is no consensus that alliances alone caused the war."},
-      {id:"hist3", c:68, err:false, t:"Austria-Hungary's July 1914 ultimatum to Serbia was worded so that Serbia could not accept it in full."},
-      {id:"hist4", c:92, err:false, t:"Germany's Schlieffen Plan required an advance through neutral Belgium."},
-      {id:"hist5", c:91, err:false, t:"Britain declared war on Germany on 4 August 1914, after German forces invaded Belgium."},
-      {id:"hist6", c:86, err:true,  t:"The United States entered the war in 1915, immediately after the sinking of the Lusitania.",
-        fix:"The United States entered the war in April 1917. The Lusitania was sunk in May 1915."}
-    ]},
-  { id:"study", label:"Study skills",
-    q:"How can you study more effectively, and which common study habits actually work?",
-    claims:[
-      {id:"study1", c:95, err:false, t:"Spacing study sessions out over time produces better long-term retention than cramming the same material into one session."},
-      {id:"study2", c:93, err:false, t:"Testing yourself on the material (retrieval practice) strengthens memory more than simply re-reading your notes."},
-      {id:"study3", c:88, err:true,  t:"You learn best when material is presented in your preferred learning style, such as visual, auditory or kinesthetic.",
-        fix:"Controlled studies have not found evidence that matching teaching to a person's preferred learning style improves learning. This is a widely repeated idea that lacks solid support."},
-      {id:"study4", c:90, err:false, t:"Getting enough sleep after studying helps consolidate what you have learned into memory."},
-      {id:"study5", c:66, err:false, t:"Highlighting and underlining text is one of the weaker study techniques, compared with self-testing."},
-      {id:"study6", c:58, err:true,  t:"Listening to music with lyrics while studying generally helps most people focus and remember better.",
-        fix:"Most research finds that music with lyrics tends to interfere with reading and verbal memory tasks for most people; instrumental or no music has a smaller effect."}
+      {id:"f1", c:95, err:false, t:"Inflation means prices rise over time, so the same money buys less."},
+      {id:"f2", c:86, err:true,  t:"Compound interest is calculated only on your original deposit, not on interest you have already earned.",
+        fix:"Compound interest is calculated on the original amount plus the interest already earned. Interest on the original amount only is called simple interest."},
+      {id:"f3", c:57, err:true,  t:"Spreading your money across many investments removes the risk of losing money.",
+        fix:"Diversifying reduces some risks, but it cannot remove the risk of losing money, especially when the whole market falls."},
+      {id:"f4", c:68, err:false, t:"Central banks can change interest rates to influence how much people borrow and spend."}
     ]}
 ];
 const FAM = ["Never heard of it","Vaguely familiar","Somewhat","Quite familiar","I know this well"];
@@ -185,7 +165,7 @@ const SHEET_COND = "Study_A";
 const ENDPOINT = "https://script.google.com/macros/s/AKfycbyNBXbb5YmTjv-2s8WL8q3Kx3fc2UatS-dTVWM-Ro7xiPBMJByu82P41UyYFIwT5vkJ4A/exec";
 // Optional: your contact details, shown in the consent text, e.g. "Contact: name@university.edu".
 const CONTACT = "";
-const KEY = "conf-study-v3-A";
+const KEY = "conf-study-v4-A";
 const PH = ["fam","read","judge"];
 
 /* ---------- State ---------- */
@@ -227,7 +207,7 @@ function progressBar(){
 /* ---------- Screens ---------- */
 function screenIntro(){
   return `<h1>How do you review an AI answer?</h1>
-  <p class="muted">A short study, about 10 minutes. You will read four AI answers to study questions (SQL, business analysis, history and study skills). For each one you first read the whole answer, then decide what you would do with each sentence before using it in an assignment.</p>
+  <p class="muted">A short study, about 5 minutes. You will read three short AI answers (about sleep, the Moon and money). For each one you first read the whole answer, then decide what you would do with each sentence before using it in an assignment.</p>
   <div class="panel">
     <h2>Before you start</h2>
     <p class="small">Some sentences in these answers are deliberately wrong. Any confidence labels shown were written by the researchers for this study and are not calculated by a real AI. If you choose "I want to check this now", a Google search for that sentence opens in a new tab so you can look it up. ${dataNote()}</p>
@@ -336,7 +316,7 @@ function buildJSON(){
       read_time_ms:(S.tJudge[T.id]&&S.tStart[T.id])? S.tJudge[T.id]-S.tStart[T.id] : null,
       judge_time_ms:(S.tEnd[T.id]&&S.tJudge[T.id])? S.tEnd[T.id]-S.tJudge[T.id] : null };
   }));
-  return { study:"ai-answer-review-v2", submission_id:S.submissionId, participant_id:S.pid, condition:SHEET_COND, ai_use_coursework:USAGE[S.usage]??null,
+  return { study:"ai-answer-review-v3", submission_id:S.submissionId, participant_id:S.pid, condition:SHEET_COND, ai_use_coursework:USAGE[S.usage]??null,
     started_at:S.startedAt, finished_at:S.finishedAt, survey:S.survey, survey_open_text:S.open, metrics:metrics(), claims };
 }
 function toCSV(obj){
@@ -345,26 +325,91 @@ function toCSV(obj){
   return [cols.join(","), ...rows.map(r=>cols.map(k=> k==="participant_id"?q(obj.participant_id): k==="condition"?q(obj.condition): k==="ai_use_coursework"?q(obj.ai_use_coursework): q(r[k])).join(","))].join("\n");
 }
 
+const stanceOf = id => {
+  const d = S.dec[id]; if(!d || !d.d) return null;
+  if(d.d==="accept" || d.d==="check_later") return "correct";
+  if(d.d==="wrong") return "wrong";
+  return d.after==="correct" ? "correct" : d.after==="wrong" ? "wrong" : "unsure";
+};
+const AFTER_TXT = {correct:"Correct", wrong:"Wrong", unsure:"Not sure"};
+const pctOf = (a,b) => b ? Math.round(a/b*100)+"%" : "n/a";
+const plural = (n,w) => n+" "+w+(n===1?"":"s");
+ 
 function screenDone(){
-  const m = metrics(), json = JSON.stringify(buildJSON(), null, 2);
+  const json = JSON.stringify(buildJSON(), null, 2);
+  const errs = Object.values(CLAIMS).filter(c=>c.err);
+  const st = c => stanceOf(c.id), dd = c => (S.dec[c.id]||{}).d;
+  const caught = errs.filter(c=>st(c)==="wrong");
+  const missed = errs.filter(c=>st(c)==="correct");
+  const unsure = errs.filter(c=>st(c)!=="wrong" && st(c)!=="correct");
+ 
+  /* per-topic summary */
+  const info = TOPICS.map(T=>{
+    const cl = T.claims, e = cl.filter(c=>c.err);
+    return { T, fam:S.fam[T.id]||0, n:cl.length,
+      own: cl.filter(c=>["accept","wrong"].includes(dd(c))).length,
+      chk: cl.filter(c=>["check_now","check_later"].includes(dd(c))).length,
+      eN: e.length,
+      eCaught: e.filter(c=>st(c)==="wrong").length,
+      eMissed: e.filter(c=>st(c)==="correct").length };
+  });
+  const sum = (arr,k) => arr.reduce((a,x)=>a+x[k],0);
+  const hiF = info.filter(x=>x.fam>=4), loF = info.filter(x=>x.fam>=1 && x.fam<=3);
+ 
+  /* insight sentences */
+  const ins = [];
+  if(hiF.length){
+    const n=sum(hiF,"n"), own=sum(hiF,"own"), chk=sum(hiF,"chk"), eN=sum(hiF,"eN"), eM=sum(hiF,"eMissed");
+    ins.push(`In ${hiF.length===1?"the topic":"the topics"} you rated 4 or 5 (${hiF.map(x=>x.T.label).join(", ")}), you decided on your own (accepted it, or marked it wrong) on ${own} of ${n} sentences, and chose to check ${chk}.`);
+    if(eN) ins.push(eM
+      ? `Those topics included ${plural(eN,"wrong sentence")}, and you accepted ${eM} of them as correct. Feeling sure about a topic does not guarantee that an AI answer about it is right.`
+      : `Those topics included ${plural(eN,"wrong sentence")}, and you did not accept any of them as correct.`);
+    if(loF.length) ins.push(`In the topics you knew less well, you chose to check ${pctOf(sum(loF,"chk"),sum(loF,"n"))} of the sentences, compared with ${pctOf(chk,n)} in the topics you knew well.`);
+  } else {
+    ins.push("You did not rate any topic 4 or 5 this time, so there is no familiar topic to compare with.");
+  }
+  if(S.cond!=="A"){
+    const hiE = errs.filter(c=>c.c>=85);
+    if(hiE.length) ins.push(`${plural(hiE.length,"wrong sentence")} carried a high confidence label (${hiE.map(c=>S.cond==="B"?c.c+"%":"High").join(", ")}). You caught ${hiE.filter(c=>st(c)==="wrong").length} and accepted ${hiE.filter(c=>st(c)==="correct").length} as correct. A high confidence label does not mean the sentence is right.`);
+  }
+  const viaG = errs.filter(c=>dd(c)==="check_now");
+  if(viaG.length){
+    const w = viaG.filter(c=>st(c)==="wrong").length, r = viaG.filter(c=>st(c)==="correct").length, u = viaG.length-w-r;
+    ins.push(`You used Google on ${plural(viaG.length,"wrong sentence")}. After looking it up you judged ${w} wrong and ${r} correct${u?`, and ${u} you were not sure about`:""}.${r?" Even after checking, a wrong sentence can look right.":""}`);
+  }
+  const later = errs.filter(c=>dd(c)==="check_later");
+  if(later.length) ins.push(`On ${plural(later.length,"wrong sentence")} you chose to accept it and check later. Those count as accepted here.`);
+ 
+  /* one card per wrong sentence */
+  const cards = errs.map(c=>{
+    const T = TOPICS.find(t=>t.id===c.topic), d = S.dec[c.id]||{}, s = stanceOf(c.id);
+    const dl = DECS.find(o=>o.k===d.d);
+    const out = s==="wrong" ? ["good","Caught"] : s==="correct" ? ["bad","Accepted as correct"] : ["","Not sure"];
+    return `<div class="err-item"><p class="ctext">${esc(c.t)}</p><p class="small">${esc(c.fix)}</p>
+      <span class="badge">${esc(T.label)}</span>
+      <span class="badge">Your familiarity: ${S.fam[T.id]||"-"}/5</span>
+      ${S.cond!=="A"?`<span class="badge">Label shown: ${S.cond==="B"?c.c+"%":tierName[tier(c.c)]}</span>`:""}
+      <span class="badge">You chose: ${dl?dl.l:"none"}</span>
+      ${d.d==="check_now"?`<span class="badge">After checking you said: ${d.after?AFTER_TXT[d.after]:"no answer"}</span>`:""}
+      <span class="badge ${out[0]}">${out[1]}</span></div>`;
+  }).join("");
+ 
   let h = `<h1>Thank you</h1>
   <p class="muted">Here is what was going on, and how you did.</p>
   <div class="panel"><h2>Your decisions on the wrong sentences</h2>
     <div class="stat">
-      <div><b>${m.errors_marked_wrong} of ${m.errors_total}</b>marked as wrong</div>
-      <div><b>${m.errors_marked_wrong_or_check-m.errors_marked_wrong}</b>marked "would check"</div>
-      <div><b>${m.errors_accepted}</b>accepted as is</div>
+      <div><b>${caught.length} of ${errs.length}</b>wrong sentences caught</div>
+      <div><b>${missed.length}</b>accepted as correct</div>
+      <div><b>${unsure.length}</b>not sure or no answer</div>
     </div>
-    <p class="small muted">Six sentences were deliberately incorrect, two per question. Some had a high confidence label and some a low one, and the labels were written by the researchers, not calculated by an AI.</p>`;
-  TOPICS.forEach(T=>T.claims.filter(c=>c.err).forEach(c=>{
-    const d = (S.dec[c.id]||{}).d;
-    const dl = DECS.find(o=>o.k===d);
-    h += `<div class="err-item"><p class="ctext">${esc(c.t)}</p><p class="small">${esc(c.fix)}</p>
-      <span class="badge">${T.label}</span>
-      ${S.cond!=="A"?`<span class="badge">Label shown: ${S.cond==="B"?c.c+"%":tierName[tier(c.c)]}</span>`:""}
-      <span class="badge ${d==="accept"?"bad":"good"}">You chose: ${dl?dl.l:"none"}</span></div>`;
-  }));
-  h += `</div>
+    <p class="small muted">${errs.length} of the ${Object.keys(CLAIMS).length} sentences were deliberately incorrect. "Caught" means you marked a sentence wrong, or looked it up on Google and then judged it wrong.${S.cond==="A"?"":" The confidence labels were written by the researchers, not calculated by an AI."}</p>
+    ${cards}
+  </div>
+  <div class="panel"><h2>What your choices suggest</h2>
+    <div class="stat">${info.map(x=>`<div><b>${x.fam} / 5</b>${esc(x.T.label)}<br><span class="small muted">Decided on your own: ${x.own} of ${x.n}. Checked: ${x.chk}. Wrong sentences caught: ${x.eCaught} of ${x.eN}.</span></div>`).join("")}</div>
+    ${ins.map(t=>`<p>${t}</p>`).join("")}
+  </div>`;
+  h += `
   ${ENDPOINT ? `<div class="panel"><h2>Sending your results</h2>
     <div class="notice" id="sendstatus" aria-live="polite" style="font-size:.95rem;color:var(--ink)"></div>
     <div class="btnrow"><button class="ghost" id="retry" hidden>Try sending again</button></div></div>` : ""}
@@ -381,6 +426,7 @@ function screenDone(){
   </div>`;
   return h;
 }
+ 
 
 /* ---------- Render + events ---------- */
 function render(){
@@ -465,11 +511,11 @@ function wire(){
           note("Saved to your downloads. Send the file to the researcher."); return;
         }
         const dl = window.claude.use ? await window.claude.use("downloads") : null;
-        if(!dl){ note("Saving is not available here. Use “Copy as text” instead."); return; }
+        if(!dl){ note("Saving is not available here. Use \u201cCopy as text\u201d instead."); return; }
         await dl.save({filename:name, data});
         note("Saved. Send the file to the researcher.");
       }catch(e){
-        note(e && e.code==="declined" ? "Save cancelled." : "Saving did not work here. Use “Copy as text” instead.");
+        note(e && e.code==="declined" ? "Save cancelled." : "Saving did not work here. Use \u201cCopy as text\u201d instead.");
       }
     };
     $("dlCsv").onclick = ()=>saveFile(`study_${stamp()}_decisions.csv`, toCSV(buildJSON()));
@@ -489,7 +535,7 @@ function dataNote(){
 }
 function showStatus(){
   const el=document.getElementById("sendstatus"), rb=document.getElementById("retry"); if(!el) return;
-  const T={idle:"",sending:"Sending your results…",
+  const T={idle:"",sending:"Sending your results\u2026",
     ok:"Your results were submitted. Thank you, you do not need to do anything else.",
     unconfirmed:"Your results were sent, but this browser could not confirm it. To be safe, please also save the backup copy below and send it to the researcher.",
     failed:"Your results could not be sent. Please save the backup copy below and send it to the researcher, or try again."};
